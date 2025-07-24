@@ -2,7 +2,7 @@ name: Code Stats with SCC + GitHub Pages HTML
 
 on:
   push:
-    branches: [ main ]
+    branches: [ gh-pages ]
 
 jobs:
   generate-report:
