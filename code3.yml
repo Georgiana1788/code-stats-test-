@@ -13,12 +13,18 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      
       - name: Install SCC
-        run: |
-          curl -sLO https://github.com/boyter/scc/releases/latest/download/scc-x86_64-unknown-linux-musl.zip
-          unzip scc-*.zip
-          sudo mv scc /usr/local/bin/
-          scc --version
+  run: |
+    LATEST_URL=$(curl -s https://api.github.com/repos/boyter/scc/releases/latest \
+      | grep "browser_download_url" \
+      | grep "linux_amd64.tar.gz" \
+      | cut -d '"' -f 4)
+    echo "Downloading from: $LATEST_URL"
+    curl -LO "$LATEST_URL"
+    ARCHIVE_NAME=$(basename "$LATEST_URL")
+    tar -xzf "$ARCHIVE_NAME"
+    sudo mv scc /usr/local/bin/
 
       - name: Generate code statistics
         run: |
