@@ -24,17 +24,42 @@ jobs:
         chmod +x scc
         sudo mv scc /usr/local/bin/
 
-    - name: Run scc and generate .md report
+       - name: Run scc and generate HTML report
       run: |
         mkdir -p public
         scc . > public/code_stats.txt
-        echo '# 📊 Cod Statistics Report' > public/index.md
-        echo '' >> public/index.md
-        echo '````text' >> public/index.md
-        cat public/code_stats.txt >> public/index.md
-        echo '````' >> public/index.md
 
-    - name: Upload artifact
+        cat <<EOF > public/index.html
+        <!DOCTYPE html>
+        <html lang="ro">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>📊 Raport Cod – SCC</title>
+          <style>
+            body { font-family: monospace; background-color: #0d1117; color: #c9d1d9; padding: 2rem; }
+            h1 { color: #58a6ff; }
+            pre { background: #161b22; padding: 1rem; border-radius: 6px; overflow-x: auto; border: 1px solid #30363d; }
+            footer { margin-top: 3rem; color: #8b949e; font-size: 0.8rem; }
+          </style>
+        </head>
+        <body>
+          <h1>📊 Cod Statistics Report</h1>
+          <p>Generat automat cu <code>scc</code> – <span id="date"></span></p>
+          <pre id="output">Se încarcă raportul...</pre>
+          <footer>© 2025 Georgiana Mangiuchi · GitHub Pages</footer>
+          <script>
+            document.getElementById("date").textContent = new Date().toLocaleDateString("ro-RO");
+            fetch('code_stats.txt')
+              .then(r => r.text())
+              .then(t => { document.getElementById("output").textContent = t; })
+              .catch(() => { document.getElementById("output").textContent = "Raportul nu a putut fi încărcat."; });
+          </script>
+        </body>
+        </html>
+        EOF
+
+- name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: code-stats-artifact
