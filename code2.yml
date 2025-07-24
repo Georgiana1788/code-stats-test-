@@ -1,0 +1,38 @@
+name: Generate Code Stats and Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # permite rulare manuală
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install SCC
+        run: |
+          curl -sLO https://github.com/boyter/scc/releases/latest/download/scc-x86_64-unknown-linux-musl.zip
+          unzip scc-*.zip
+          sudo mv scc /usr/local/bin/
+          scc --version
+
+      - name: Generate code statistics
+        run: |
+          mkdir -p site
+          scc . > site/stats.txt
+
+      - name: Generate index.html
+        run: |
+          echo "<html><head><title>Code Stats</title></head><body><h1>Code Statistics</h1><pre>" > site/index.html
+          cat site/stats.txt >> site/index.html
+          echo "</pre></body></html>" >> site/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
