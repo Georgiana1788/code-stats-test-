@@ -17,12 +17,16 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-    - name: Download scc binary
-      run: |
-        curl -LO https://github.com/boyter/scc/releases/latest/download/scc-x86_64-unknown-linux.zip
-        unzip scc-*.zip
-        chmod +x scc
-        sudo mv scc /usr/local/bin/
+        - name: Install SCC
+  run: |
+    LATEST_URL=$(curl -s https://api.github.com/repos/boyter/scc/releases/latest \
+      | grep "browser_download_url" \
+      | grep "linux_amd64.tar.gz" \
+      | cut -d '"' -f 4)
+    echo "Downloading SCC from: $LATEST_URL"
+    curl -LO "$LATEST_URL"
+    tar -xzf "$(basename $LATEST_URL)"
+    sudo mv scc /usr/local/bin/
 
     - name: Run scc and generate HTML report
       run: |
