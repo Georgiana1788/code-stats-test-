@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📊 Raport Cod – SCC</title>
+  <style>
+    body {
+      font-family: monospace;
+      background-color: #0d1117;
+      color: #c9d1d9;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      color: #58a6ff;
+    }
+    pre {
+      background-color: #161b22;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      border: 1px solid #30363d;
+    }
+    footer {
+      font-size: 0.8rem;
+      margin-top: 3rem;
+      color: #8b949e;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Cod Statistics Report</h1>
+  <p>Generat automat cu <code>scc</code> – <span id="date"></span></p>
+  <pre id="output">Se încarcă raportul...</pre>
+
+  <footer>© 2025 Georgiana Mangiuchi · GitHub Pages</footer>
+
+  <script>
+    document.getElementById("date").textContent = new Date().toLocaleDateString("ro-RO");
+    fetch('code_stats.txt')
+      .then(res => res.text())
+      .then(text => {
+        document.getElementById("output").textContent = text;
+      })
+      .catch(err => {
+        document.getElementById("output").textContent = "Raportul nu a putut fi încărcat.";
+      });
+  </script>
+</body>
+</html>
