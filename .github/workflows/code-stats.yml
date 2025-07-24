@@ -1,0 +1,49 @@
+name: Code Stats with SCC + GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Git config
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+    - name: Download scc
+      run: |
+        curl -LO https://github.com/boyter/scc/releases/latest/download/scc-x86_64-unknown-linux.zip
+        unzip scc-x86_64-unknown-linux.zip
+        chmod +x scc
+        sudo mv scc /usr/local/bin/
+
+    - name: Run scc and generate .md report
+      run: |
+        mkdir -p public
+        scc . > public/code_stats.txt
+        echo '# 📊 Cod Statistics Report' > public/index.md
+        echo '' >> public/index.md
+        echo '````text' >> public/index.md
+        cat public/code_stats.txt >> public/index.md
+        echo '````' >> public/index.md
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: code-stats-artifact
+        path: public/*
+
+    - name: Deploy to GitHub Pages (gh-pages branch)
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
+        publish_branch: gh-pages
+        force_orphan: true
